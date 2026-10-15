@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  web:
+    build: ./frontend
+    image: vidly_web
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/app
+  web-tests:
+    image: vidly_web
+    volumes:
+      - ./frontend:/app
+    command: npm test
+  api:
+    build: ./backend
+    ports:
+      - 3001:3001
+    environment:
+      DB_URL: mongodb://db/vidly
+      CHOKIDAR_USEPOLLING: "true" # Forzar polling de archivos
+      WATCHPACK_POLLING: "true" # Para Next.js / Webpack
+    volumes:
+      - ./backend:/app
+      - /app/node_modules # Recomendado: evita sobreescribir dependencias
+    command: ./docker-entrypoint.sh
+  db:
+    image: mongo:7.0
+    ports:
+      - 27017:27017
+    volumes:
+      - vidly:/data/db
+volumes:
+  vidly:
