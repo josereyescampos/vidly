@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   web:
-    image: josereyes1969/vidly-web:latest
+    image: josereyes1969/vidly-web-opt:latest
     ports:
       - 80:80
     restart: unless-stopped # check the formats for yml's files
