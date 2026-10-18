@@ -1,0 +1,34 @@
+# Step 1: build stage
+FROM node:14.16.0-alpine3.13 as build-stage
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Step 2: Production
+FROM nginx:1.12-alpine
+
+# 1. Creamos el usuario y grupo app
+RUN addgroup app && adduser -S -G app app
+
+# 2. Creamos directorios temporales y damos permisos al usuario app (incluyendo /var/run para el .pid)
+RUN mkdir -p /var/cache/nginx/client_temp \
+             /var/cache/nginx/fastcgi_temp \
+             /var/cache/nginx/uwsgi_temp \
+             /var/cache/nginx/scgi_temp \
+             /var/cache/nginx/proxy_temp \
+             /var/run && \
+    chown -R app:app /var/cache/nginx && \
+    chown -R app:app /usr/share/nginx/html && \
+    chown -R app:app /etc/nginx && \
+    chown -R app:app /var/run
+
+# 3. Cambiamos al usuario app
+USER app
+
+COPY --from=build-stage /app/build /usr/share/nginx/html
+EXPOSE 80
+
+# 4. Forzamos a Nginx a usar un archivo .pid en una ruta accesible por el usuario app
+ENTRYPOINT ["nginx", "-g", "daemon off; pid /tmp/nginx.pid;"]
