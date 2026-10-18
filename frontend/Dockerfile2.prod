@@ -12,7 +12,7 @@ FROM nginx:1.12-alpine
 # 1. Creamos el usuario y grupo app
 RUN addgroup app && adduser -S -G app app
 
-# 2. Creamos directorios temporales y damos permisos al usuario app (incluyendo /var/run para el .pid)
+# 2. Creamos directorios temporales y damos permisos al usuario app
 RUN mkdir -p /var/cache/nginx/client_temp \
              /var/cache/nginx/fastcgi_temp \
              /var/cache/nginx/uwsgi_temp \
@@ -30,5 +30,5 @@ USER app
 COPY --from=build-stage /app/build /usr/share/nginx/html
 EXPOSE 80
 
-# 4. Forzamos a Nginx a usar un archivo .pid en una ruta accesible por el usuario app
-ENTRYPOINT ["nginx", "-g", "daemon off; pid /tmp/nginx.pid;"]
+# 4. ENTRYPOINT estándar sin duplicar el pid
+ENTRYPOINT ["nginx", "-g", "daemon off;" ]
