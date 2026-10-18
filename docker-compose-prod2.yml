@@ -1,12 +1,12 @@
 version: "3.8"
 services:
   web:
-    image: josereyes1969/vidly-web:latest
+    image: josereyes1969/vidly-web
     ports:
       - 80:80
     restart: unless-stopped # check the formats for yml's files
   api:
-    image: josereyes1969/vidly-api:latest
+    image: josereyes1969/vidly-api
     ports:
       - 3001:3001
     environment:
